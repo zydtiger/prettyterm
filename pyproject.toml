@@ -9,3 +9,10 @@ requires-python = ">=3.9"
 dependencies = [
     "rich>=13.0.0",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+packages = ["src/prettyterm"]
