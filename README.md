@@ -109,6 +109,21 @@ logger.critical("System shutting down")
 - `ERROR` - Red
 - `CRITICAL` - Red on white
 
+**Custom Log Level:**
+
+By default, logging is set to `INFO` level. You can change this by importing and calling `setup_colored_logging`:
+
+```python
+from prettyterm import get_logger, setup_colored_logging
+import logging
+
+# Set to DEBUG level to see all messages
+setup_colored_logging(log_level=logging.DEBUG)
+
+logger = get_logger("my_app")
+logger.debug("This will now be visible")
+```
+
 ## Development
 
 ```bash

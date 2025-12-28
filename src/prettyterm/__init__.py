@@ -5,4 +5,4 @@ from prettyterm.table import print_table
 # Automatically setup colored logging when this module is imported
 setup_colored_logging()
 
-__all__ = ["track", "print_table", "get_logger"]
+__all__ = ["track", "print_table", "get_logger", "setup_colored_logging"]

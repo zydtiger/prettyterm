@@ -1,7 +1,7 @@
 [project]
 name = "prettyterm"
 authors = [{ name = "Zhiyuan Ding", email = "zhiyuanding01@gmail.com" }]
-version = "0.2.2"
+version = "0.2.3"
 description = "Pretty terminal utilities wrapped around rich: colorful progress bars, dict-to-table printing, and more."
 license = { text = "MIT" }
 readme = "README.md"
