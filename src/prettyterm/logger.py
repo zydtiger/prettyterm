@@ -78,3 +78,16 @@ def get_logger(name: str) -> LoggerProtocol:
     """
     logger = logging.getLogger(name)
     return logger  # type: ignore[return-value]
+
+
+# --- Usage Example ---
+
+if __name__ == "__main__":
+    setup_colored_logging()
+    logger = get_logger("demo")
+    logger.debug("Debugging information")
+    logger.info("Application started")
+    logger.success("Operation completed successfully!")
+    logger.warning("This is a warning")
+    logger.error("An error occurred")
+    logger.critical("Critical system failure")
