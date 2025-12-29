@@ -38,7 +38,7 @@ for i in pbar:
 
 **Output:**
 
-<img src="./examples/pbar.png" alt="Progress bar example">
+<img src="https://raw.githubusercontent.com/zydtiger/prettyterm/dev/examples/pbar.png" alt="Progress bar example">
 
 ---
 
@@ -68,7 +68,7 @@ print_table(data, title="User Info", show_lines=True)
 
 **Output:**
 
-<img src="./examples/table.png" alt="Table printing example">
+<img src="https://raw.githubusercontent.com/zydtiger/prettyterm/dev/examples/table.png" alt="Table printing example">
 
 ---
 
@@ -98,7 +98,7 @@ logger.critical("System shutting down")
 
 **Output:**
 
-<img src="./examples/logger.png" alt="Logger example">
+<img src="https://raw.githubusercontent.com/zydtiger/prettyterm/dev/examples/logger.png" alt="Logger example">
 
 **Log Colors:**
 
