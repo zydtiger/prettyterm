@@ -1,4 +1,4 @@
-# prettyterm
+# [prettyterm](https://github.com/zydtiger/prettyterm)
 
 Pretty terminal utilities wrapped around [Rich](https://rich.readthedocs.io/): colorful progress bars, dict-to-table printing, colored logging, and more.
 
