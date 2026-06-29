@@ -68,7 +68,7 @@ wheels = [
 
 [[package]]
 name = "prettyterm"
-version = "0.2.0"
+version = "0.2.5"
 source = { editable = "." }
 dependencies = [
     { name = "colorlog" },
