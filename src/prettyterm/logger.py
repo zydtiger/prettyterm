@@ -145,13 +145,17 @@ def _colored_formatter() -> colorlog.ColoredFormatter:
     )
 
 
+def _validate_color(color: ColorMode) -> None:
+    if color is not True and color is not False and color != "auto":
+        raise ValueError("color must be 'auto', True, or False")
+
+
 def _color_enabled(stream: Any, color: ColorMode) -> bool:
+    _validate_color(color)
     if color is True:
         return True
     if color is False:
         return False
-    if color != "auto":
-        raise ValueError("color must be 'auto', True, or False")
     if "NO_COLOR" in os.environ or os.environ.get("TERM", "").lower() == "dumb":
         return False
 
@@ -216,8 +220,7 @@ def _setup_logging(
             console_handler.setFormatter(formatter)
             new_handlers.append(_mark_owned(console_handler))
         else:
-            # Validate the color mode even when no console handler is requested.
-            _color_enabled(sys.stderr, color)
+            _validate_color(color)
 
         if log_file is not None:
             file_handler = logging.FileHandler(log_file, encoding="utf-8")

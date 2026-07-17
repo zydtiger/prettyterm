@@ -1,5 +1,6 @@
 import io
 import logging
+import re
 import subprocess
 import sys
 import threading
@@ -176,6 +177,24 @@ def test_file_only_logging_is_utf8_plain_and_renders_success(
     assert "SUCCESS" in contents
     assert "完成 ✓" in contents
     assert "plain red" in contents
+
+
+def test_file_only_setup_does_not_probe_console_stream(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class DetachedStream:
+        def isatty(self) -> bool:
+            raise AssertionError("file-only setup must not inspect stderr")
+
+    monkeypatch.setattr(sys, "stderr", DetachedStream())
+    log_path = tmp_path / "detached.log"
+
+    setup_logging(console=False, log_file=log_path)
+    get_logger("detached").success("file logging works")
+
+    contents = log_path.read_text(encoding="utf-8")
+    assert "SUCCESS" in contents
+    assert "file logging works" in contents
 
 
 def test_plain_handlers_strip_escape_sequences_without_losing_text(
@@ -432,3 +451,29 @@ def test_logger_retains_standard_and_success_methods() -> None:
         assert callable(getattr(logger, method_name))
     assert SUCCESS_LEVEL == 25
     assert logging.getLevelName(SUCCESS_LEVEL) == "SUCCESS"
+
+
+def test_readme_logging_examples_execute(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    readme_path = Path(__file__).parents[1] / "README.md"
+    logging_section = (
+        readme_path.read_text(encoding="utf-8")
+        .split("### `setup_logging()`", 1)[1]
+        .split("## Development", 1)[0]
+    )
+    examples = re.findall(r"```python\n(.*?)```", logging_section, flags=re.DOTALL)
+    assert len(examples) == 3
+
+    console_output = ConsoleStream(False)
+    monkeypatch.setattr(sys, "stderr", console_output)
+    monkeypatch.chdir(tmp_path)
+    for index, example in enumerate(examples, start=1):
+        exec(compile(example, f"README logging example {index}", "exec"), {})
+
+    app_contents = (tmp_path / "app.log").read_text(encoding="utf-8")
+    worker_contents = (tmp_path / "worker.log").read_text(encoding="utf-8")
+    assert "SUCCESS" in app_contents
+    assert "SUCCESS" in worker_contents
+    assert "\x1b" not in app_contents
+    assert "\x1b" not in worker_contents

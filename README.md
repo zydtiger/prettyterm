@@ -1,6 +1,6 @@
 # [prettyterm](https://github.com/zydtiger/prettyterm)
 
-Pretty terminal utilities wrapped around [Rich](https://rich.readthedocs.io/): colorful progress bars, dict-to-table printing, colored logging, and more.
+Pretty terminal utilities wrapped around [Rich](https://rich.readthedocs.io/): colorful progress bars, dict-to-table printing, TTY-aware logging, and more.
 
 ## Installation
 
@@ -72,19 +72,26 @@ print_table(data, title="User Info", show_lines=True)
 
 ---
 
-### `get_logger()` - Colored Logging with SUCCESS Level
+### `setup_logging()` and `get_logger()` - Unified Logging with SUCCESS Level
 
-Get a pre-configured logger with colored output and a custom `SUCCESS` logging level (sits between INFO and WARNING).
+Configure console and file logging explicitly, then get a standard logger with a custom `SUCCESS` level between `INFO` and `WARNING`. Importing `prettyterm` does not change the root logger.
 
 **Features:**
 
-- Color-coded log levels
-- Custom `SUCCESS` level (green)
-- Auto-configured on import
+- Automatic color only for an eligible interactive TTY
+- Plain redirected console and UTF-8 file output with no ANSI escapes
+- Console-only, file-only, or combined handlers
+- Custom `SUCCESS` level (green on colored consoles and named `SUCCESS` in plain output)
+- Idempotent reconfiguration without removing application-owned handlers
 - Clean, piped format: `timestamp │ level │ name │ message`
 
 ```python
-from prettyterm import get_logger
+import logging
+
+from prettyterm import get_logger, setup_logging
+
+# Explicit setup; color="auto" is the default.
+setup_logging(logging.INFO)
 
 logger = get_logger("my_app")
 
@@ -95,6 +102,8 @@ logger.warning("Resource usage high")
 logger.error("Connection failed")
 logger.critical("System shutting down")
 ```
+
+`color="auto"` enables console colors only when stderr is an interactive TTY. Redirected output, `NO_COLOR`, and `TERM=dumb` use the plain formatter. Use `color=True` or `color=False` for an explicit override.
 
 **Output:**
 
@@ -109,31 +118,61 @@ logger.critical("System shutting down")
 - `ERROR` - Red
 - `CRITICAL` - Red on white
 
-**Custom Log Level:**
+**Console and file logging:**
 
-By default, logging is set to `INFO` level. You can change this by importing and calling `setup_colored_logging`:
+File handlers are always UTF-8 and plain, even when the console is colored. `file_level=None` inherits `log_level`; set it explicitly when the file should capture more detail than the console.
 
 ```python
-from prettyterm import get_logger, setup_colored_logging
 import logging
 
-# Set to DEBUG level to see all messages
-setup_colored_logging(log_level=logging.DEBUG)
+from prettyterm import get_logger, setup_logging
+
+setup_logging(
+    logging.INFO,
+    log_file="app.log",
+    file_level=logging.DEBUG,
+)
 
 logger = get_logger("my_app")
-logger.debug("This will now be visible")
+logger.debug("Written to app.log only")
+logger.success("Visible as SUCCESS in the console and app.log")
 ```
+
+**File-only logging:**
+
+```python
+from prettyterm import get_logger, setup_logging
+
+setup_logging(console=False, log_file="worker.log")
+
+logger = get_logger("worker")
+logger.info("Running without a console handler")
+logger.success("Written plainly as SUCCESS with no ANSI escapes")
+```
+
+Calling `setup_logging()` again closes and replaces only handlers previously installed by PrettyTerm. Handlers installed by the consuming application are preserved.
+
+**Migrating to 0.3.0:**
+
+Version 0.3.0 intentionally removes `setup_colored_logging()` and import-time root logger configuration. Applications must import `setup_logging` and call it explicitly before expecting PrettyTerm handlers. There is no compatibility alias.
 
 ## Development
 
 ```bash
-# Install in editable mode
-pip install -e .
+# Install the project and locked development tools
+uv sync --group dev
+
+# Test, format-check, lint, type-check, and build
+uv run pytest -q
+uv run ruff format --check .
+uv run ruff check .
+uv run mypy
+uv build
 
 # Run examples
-python src/prettyterm/pbar.py
-python src/prettyterm/table.py
-python src/prettyterm/logger.py
+uv run python src/prettyterm/pbar.py
+uv run python src/prettyterm/table.py
+uv run python src/prettyterm/logger.py
 ```
 
 ## License
