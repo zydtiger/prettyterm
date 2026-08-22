@@ -159,14 +159,15 @@ Version 0.3.0 intentionally removes `setup_colored_logging()` and import-time ro
 ## Development
 
 ```bash
+# Install the hook runner once, then activate this checkout
+uv tool install prek
+prek install
+
 # Install the project and locked development tools
 uv sync --group dev
 
-# Test, format-check, lint, type-check, and build
-uv run pytest -q
-uv run ruff format --check .
-uv run ruff check .
-uv run mypy
+# Run the same checks used by CI, then build
+prek run --all-files
 uv build
 
 # Run examples

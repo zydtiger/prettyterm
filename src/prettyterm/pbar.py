@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Iterable, Sized
 from time import sleep
 from typing import Any, cast
