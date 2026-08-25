@@ -42,9 +42,7 @@ jobs:
         run: uv sync --locked --group dev
 
       - name: Run commit hooks
-        run: |
-          uv tool install prek==0.4.14
-          prek run --all-files
+        run: uvx prek@0.4.14 run --all-files
 
       - name: Build package
         if: matrix.python-version == '3.14'
