@@ -22,8 +22,7 @@ dev = [
 python_version = "3.9"
 follow_imports = "skip"
 files = [
-    "src/prettyterm/logger.py",
-    "src/prettyterm/__init__.py",
+    "src/prettyterm",
     "tests",
 ]
 
