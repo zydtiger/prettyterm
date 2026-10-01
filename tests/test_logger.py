@@ -5,8 +5,8 @@ import subprocess
 import sys
 import threading
 import time
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 import pytest
 
@@ -380,7 +380,7 @@ def test_concurrent_setup_leaves_one_owned_handler(
         try:
             start.wait()
             setup_logging(console=True, color=False)
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001 - report worker failures to the test
             errors.append(error)
 
     threads = [threading.Thread(target=configure) for _ in range(4)]
@@ -469,7 +469,7 @@ def test_readme_logging_examples_execute(
     monkeypatch.setattr(sys, "stderr", console_output)
     monkeypatch.chdir(tmp_path)
     for index, example in enumerate(examples, start=1):
-        exec(compile(example, f"README logging example {index}", "exec"), {})
+        exec(compile(example, f"README logging example {index}", "exec"), {})  # noqa: S102 - trusted repository examples
 
     app_contents = (tmp_path / "app.log").read_text(encoding="utf-8")
     worker_contents = (tmp_path / "worker.log").read_text(encoding="utf-8")
