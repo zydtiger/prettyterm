@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 import threading
+from contextlib import suppress
 from typing import Any, Literal, Optional, Protocol, Union
 
 import colorlog
@@ -229,10 +230,9 @@ def _setup_logging(
             new_handlers.append(_mark_owned(file_handler))
     except Exception:
         for handler in new_handlers:
-            try:
+            # Preserve the original failure if cleanup also fails.
+            with suppress(Exception):
                 handler.close()
-            except Exception:
-                pass
         raise
 
     root_logger = logging.getLogger()
@@ -264,17 +264,16 @@ def _setup_logging(
         for handler in owned_handlers:
             root_logger.addHandler(handler)
         for handler in new_handlers:
-            try:
+            # Preserve the original failure if cleanup also fails.
+            with suppress(Exception):
                 handler.close()
-            except Exception:
-                pass
         raise
 
     close_error: Optional[Exception] = None
     for handler in owned_handlers:
         try:
             handler.close()
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001 - close every handler, then re-raise
             if close_error is None:
                 close_error = error
     if close_error is not None:
